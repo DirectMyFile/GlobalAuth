@@ -16,7 +16,7 @@ All requests and responses are handled synchronously.
 
 ## Request layout
 
-```
+```json
 {
   "action": "",
   "params": {}
@@ -29,7 +29,7 @@ All requests and responses are handled synchronously.
 
 ## Response layout
 
-```
+```json
 {
   "results": {}
   "error": ""
