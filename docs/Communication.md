@@ -31,8 +31,8 @@ All requests and responses are handled synchronously.
 
 ```json
 {
-  "results": {}
-  "error": ""
+  "results": {},
+  "error": "",
   "status": 0
 }
 ```
