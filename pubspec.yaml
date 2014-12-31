@@ -1,0 +1,5 @@
+name: GlobalAuth
+version: 0.0.1
+author: samrg472 <samrg472@gmail.com>
+homepage: https://github.com/DirectMyFile/GlobalAuth
+description: An LDAP replacement for authentication systems.

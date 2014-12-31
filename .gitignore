@@ -1,3 +1,5 @@
 # Ignore project files
+bin/packages
+packages
 .idea
 *.iml
