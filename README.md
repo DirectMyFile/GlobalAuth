@@ -1,4 +1,4 @@
 GlobalAuth
 ==========
 
-An LDAP replacement for authentication systems
+An LDAP replacement for authentication systems.
