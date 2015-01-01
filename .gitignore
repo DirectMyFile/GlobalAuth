@@ -1,3 +1,6 @@
+# Ignore runtime
+run
+
 # Ignore package directories
 bin/packages
 packages

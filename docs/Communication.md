@@ -7,7 +7,7 @@ action available on the server.
 # Socket data
 
 All data is transmitted in UTF-8 encoding and each message is delimited by
-a double carriage return line feed.
+a carriage return line feed.
 
 # Performing requests
 
