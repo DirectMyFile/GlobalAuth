@@ -82,26 +82,22 @@ class ConfigWriter {
     if (exists)
       json = JSON.decode(_path.readAsStringSync());
 
-    if (json[ConfigReader.SECURE] == null)
-      json[ConfigReader.SECURE] = {};
-
-    var secure = json[ConfigReader.SECURE];
-    if (secure[ConfigReader.ENABLED] == null)
-      secure[ConfigReader.ENABLED] = config.useSecure;
-    if (secure[ConfigReader.PORT] == null)
-      secure[ConfigReader.PORT] = config.sslPort;
-
-    if (json[ConfigReader.INSECURE] == null)
-      json[ConfigReader.INSECURE] = {};
-
-    var insecure = json[ConfigReader.INSECURE];
-    if (insecure[ConfigReader.ENABLED] == null)
-      insecure[ConfigReader.ENABLED] = config.useInsecure;
-    if (insecure[ConfigReader.PORT] == null)
-      insecure[ConfigReader.PORT] = config.port;
+    _communications(json, ConfigReader.SECURE, config.useSecure, config.sslPort);
+    _communications(json, ConfigReader.INSECURE, config.useInsecure, config.port);
 
     if (exists)
       _path.deleteSync();
     _path.writeAsStringSync(enc.convert(json));
+  }
+
+  void _communications(Map json, String field, bool enabled, int port) {
+    if (json[field] == null)
+      json[field] = {};
+
+    var struct = json[field];
+    if (struct[ConfigReader.ENABLED] == null)
+      struct[ConfigReader.ENABLED] = enabled;
+    if (struct[ConfigReader.PORT] == null)
+      struct[ConfigReader.PORT] = port;
   }
 }
