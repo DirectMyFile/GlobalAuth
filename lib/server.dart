@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
+import 'common.dart';
+
 part 'server/config.dart';
 
 class Server {
@@ -22,6 +24,9 @@ class Server {
   Future listen() async {
     if (config.useInsecure) {
       _socket = await ServerSocket.bind(config.bindAddress, config.port);
+      _socket.listen(_handler).onError((err) {
+        print("An error occured accepting an insecure connection => $err");
+      });
     }
 
     if (config.useSecure) {
@@ -29,9 +34,21 @@ class Server {
                               password: config.certPassword);
       _secureSocket = await SecureServerSocket.bind(config.sslBindAddress,
                                                     config.sslPort,
-                                                    "CN=${config.certCommonName}}");
+                                                    "CN=${config.certCommonName}");
+      _secureSocket.listen(_handler).onError((err) {
+        print("An error occured accepting a secure connection => $err");
+      });
     }
+
     return null;
+  }
+
+  void _handler(Socket s) {
+    print("Client connected");
+    s.transform(UTF8.decoder).transform(new CRLFLineSplitter())
+                                          .listen((String data) {
+      print("Data: $data");
+    });
   }
 
   void stop() {
