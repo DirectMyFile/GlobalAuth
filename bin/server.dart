@@ -25,10 +25,16 @@ void main(List<String> args) {
     return;
   }
 
+  File path = new File(results['path']);
+
   if (results['genconf']) {
     var def = new Config();
-    var writer = new ConfigWriter(new File(results['path']));
+    var writer = new ConfigWriter(path);
     writer.write(def);
     return;
   }
+
+  var conf = new ConfigReader(path);
+  var server = new Server(conf.read());
+  server.listen();
 }
