@@ -4,16 +4,9 @@ part of globalauth.common;
  * This class splits [String] values into individual lines based on a
  * carriage-return line-feed.
  */
-class CRLFLineSplitter extends Converter<String, List<String>> {
+class CRLFLineSplitter extends LineSplitter {
 
   const CRLFLineSplitter();
-
-  @override
-  List<String> convert(String data) {
-    var lines = new List<String>();
-    _CRLFLineSplitterSink._addSlice(data, 0, data.length, true, lines.add);
-    return lines;
-  }
 
   @override
   StringConversionSink startChunkedConversion(Sink<String> sink) {
