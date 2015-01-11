@@ -47,7 +47,8 @@ class Server {
     print("Client connected");
     s.transform(UTF8.decoder).transform(new CRLFLineSplitter())
                                           .listen((String data) {
-      print("Data: $data");
+      var json = JSON.decode(data);
+
     });
   }
 
