@@ -48,8 +48,12 @@ class Server {
     s.transform(UTF8.decoder).transform(new CRLFLineSplitter())
                                           .listen((String data) {
       var json = JSON.decode(data);
+    }, onDone: _clientDisconnected,
+        onError: (_) => _clientDisconnected());
+  }
 
-    });
+  void _clientDisconnected() {
+    print("Client disconnected");
   }
 
   void stop() {
