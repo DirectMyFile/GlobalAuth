@@ -8,3 +8,4 @@ environment:
 dependencies:
   args: ">=0.12.2+1 <0.13.0"
   task_queue: ">=1.0.0 <2.0.0"
+  mongo_dart: ">=0.1.45 <0.2.0"

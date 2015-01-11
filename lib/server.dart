@@ -1,27 +1,32 @@
 library globalauth.server;
 
+import 'package:mongo_dart/mongo_dart.dart' as mongodb;
+
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
 import 'common.dart';
 
+part 'server/storage.dart';
 part 'server/config.dart';
 
 class Server {
 
+  final Storage _storage;
   final Config config;
 
   SecureServerSocket _secureSocket;
   ServerSocket _socket;
 
-  Server(this.config);
+  Server(this.config, this._storage);
 
   /**
-   * Starts listening for secure and insecure communications depending on the
+   * Starts listening for secure and insecure communications based on the
    * configuration settings.
    */
-  Future listen() async {
+  Future initialize() async {
+    // Initialize insecure server
     if (config.useInsecure) {
       _socket = await ServerSocket.bind(config.bindAddress, config.port);
       _socket.listen(_handler).onError((err) {
@@ -29,6 +34,7 @@ class Server {
       });
     }
 
+    // Initialize secure server
     if (config.useSecure) {
       SecureSocket.initialize(database: config.certDatabasePath,
                               password: config.certPassword);
@@ -39,6 +45,9 @@ class Server {
         print("An error occured accepting a secure connection => $err");
       });
     }
+
+    // Initialize database connection
+    await _storage.connect();
 
     return null;
   }

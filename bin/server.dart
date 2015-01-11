@@ -34,7 +34,7 @@ void main(List<String> args) {
     return;
   }
 
-  var conf = new ConfigReader(path);
-  var server = new Server(conf.read());
-  server.listen();
+  var conf = new ConfigReader(path).read();
+  var server = new Server(conf, new Storage.create(conf));
+  server.initialize();
 }

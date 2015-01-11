@@ -6,37 +6,37 @@ part of globalauth.server;
 class Config {
 
   /**
-   * Whether to enable listening to secure communications
+   * Whether to enable listening to secure communications.
    */
   final bool useSecure;
 
   /**
-   * The bind address for the secure server to bind to
+   * The bind address for the secure server to bind to.
    */
   final String sslBindAddress;
 
   /**
-   * Port used for secure communications
+   * Port used for secure communications.
    */
   final int sslPort;
 
   /**
-   * Path to the NSS key database
+   * Path to the NSS key database.
    */
   final String certDatabasePath;
 
   /**
-   * The common name of the certificate to use
+   * The common name of the certificate to use.
    */
   final String certCommonName;
 
   /**
-   * Password of the database
+   * Password of the database.
    */
   final String certPassword;
 
   /**
-   * Whether to enable listening to insecure communications
+   * Whether to enable listening to insecure communications.
    */
   final bool useInsecure;
 
@@ -46,9 +46,14 @@ class Config {
   final String bindAddress;
 
   /**
-   * Port used for insecure communications
+   * Port used for insecure communications.
    */
   final int port;
+
+  /**
+   * URI of the database to connect to.
+   */
+  final String dbUri;
 
   Config({this.useSecure: false,
           this.sslBindAddress: "0.0.0.0",
@@ -58,23 +63,25 @@ class Config {
           this.certPassword: "12345",
           this.useInsecure: true,
           this.bindAddress: "0.0.0.0",
-          this.port: 3100});
-
+          this.port: 3100,
+          this.dbUri: "mongodb://admin:12345@localhost/global_auth"});
 }
 
 class ConfigReader {
 
   static const String SECURE = "secure";
-  static const String CERT_INFO = "certificate";
   static const String INSECURE = "insecure";
-
   static const String ENABLED = "enabled";
   static const String BIND_ADDR = "bind";
   static const String PORT = "port";
 
+  static const String CERT_INFO = "certificate";
   static const String CERT_PATH = "path";
   static const String CERT_NAME = "common_name";
   static const String CERT_PASS = "password";
+
+  static const String DB = "db";
+  static const String DB_URI = "uri";
 
   final File _path;
 
@@ -98,13 +105,17 @@ class ConfigReader {
     int port = _fieldCheck(insecure, PORT);
     String bind = _fieldCheck(insecure, BIND_ADDR);
 
+    var db = _fieldCheck(json, DB);
+    String uri = _fieldCheck(db, DB_URI);
+
     return new Config(useSecure: useSecure,
                       sslPort: sslPort,
                       certDatabasePath: path,
                       certCommonName: name,
                       certPassword: pass,
                       useInsecure: useInsecure,
-                      port: port);
+                      port: port,
+                      dbUri: uri);
   }
 
   _fieldCheck(Map m, String field) {
@@ -148,6 +159,14 @@ class ConfigWriter {
                             config.bindAddress,
                             config.useInsecure,
                             config.port);
+
+    var db = json[ConfigReader.DB];
+    if (db == null)
+      json[ConfigReader.DB] = {};
+    db = json[ConfigReader.DB];
+
+    if (db[ConfigReader.DB_URI] == null)
+      db[ConfigReader.DB_URI] = config.dbUri;
 
     if (exists)
       _path.deleteSync();
