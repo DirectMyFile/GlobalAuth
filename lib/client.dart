@@ -1,13 +1,78 @@
 library globalauth.client;
 
 import 'package:task_queue/task_queue.dart';
+import 'common.dart';
 
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
-part 'client/commands.dart';
-part 'client/manager.dart';
+part 'client/cli/commands.dart';
+part 'client/cli/manager.dart';
+
+/**
+ * Client that handles a connection to the Global Auth server. Used for
+ * interacting with a server, such as retrieving data or changing settings.
+ */
+class GAClient {
+
+  /**
+   * Address of the server to connect to.
+   */
+  final String address;
+
+  /**
+   * Port to connect to the server on.
+   */
+  final int port;
+
+  /**
+   * Whether to use a secure connection or not.
+   */
+  final bool secure;
+
+  /**
+   * Whether to accept bad certificates or not.
+   */
+  final bool badCert;
+
+  bool _connected = false;
+  Socket _sock;
+
+  GAClient({this.address: "localhost",
+            this.port: 3100,
+            this.secure: false,
+            this.badCert: false});
+
+  Future connect() async {
+    if (_connected) throw new Exception("Already connected");
+    if (secure) {
+      _sock = await SecureSocket.connect(address,
+                                          port,
+                                          onBadCertificate: (_) => badCert);
+    } else {
+      _sock = await Socket.connect(address, port);
+    }
+    _connected = true;
+  }
+
+  void listen() {
+    _sock.transform(UTF8.decoder)
+          .transform(new CRLFLineSplitter())
+          .listen(_handler);
+  }
+
+  void disconnect() {
+    if (_connected && _sock != null) {
+      _sock.destroy();
+    }
+    _connected = false;
+  }
+
+  void _handler(String data) {
+
+  }
+}
 
 /**
  * Client that handles Read-eval-print-loop. There must be only one instance
@@ -15,27 +80,27 @@ part 'client/manager.dart';
  */
 class CliClient {
 
-  static CliClient get CLIENT => _CLIENT;
-  static CliClient _CLIENT;
-
   static final RegExp _reg = new RegExp("'.*?'|\".*?\"|\\S+");
 
   final TaskQueue _queue = new TaskQueue();
   final String termPrefix = "> ";
 
+  GAClient get client => _client;
+  set client(GAClient client) {
+    if (_client != null) {
+      _client.disconnect();
+    }
+    _client = client;
+  }
+  GAClient _client;
+
   StreamSubscription _sub;
   CommandManager _manager;
   bool _running = false;
 
-  factory CliClient([manager]) {
-    if (_CLIENT != null) throw new Exception("Client instance already created");
-    if (manager == null) manager = new CommandManager();
-
-    _CLIENT = new CliClient._internal(manager);
-    return CLIENT;
+  CliClient([this._manager]) {
+    if (_manager == null) _manager = new CommandManager();
   }
-
-  CliClient._internal(this._manager);
 
   void listen() {
     _running = true;
@@ -69,7 +134,9 @@ class CliClient {
       return _end();
     }
 
-    _manager.execute(args[0], args.getRange(1, args.length).toList(growable: false));
+    var command = args[0];
+    args = args.getRange(1, args.length).toList(growable: false);
+    await _manager.execute(this, command, args);
 
     // Execution of command finished, reset command line
     return _end();

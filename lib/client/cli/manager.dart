@@ -14,6 +14,8 @@ class CommandManager {
     var manager = new CommandManager._internal();
     if (useDefault) {
       manager += new ExitCommand();
+      manager += new ConnectCommand();
+      manager += new DisconnectCommand();
     }
     return manager;
   }
@@ -26,13 +28,13 @@ class CommandManager {
     commands[command.name] = command;
   }
 
-  void execute(String command, List<String> args) {
+  Future execute(CliClient client, String command, List<String> args) async {
     Command c = commands[command];
     if (c == null) {
       print("Command does not exist: $command");
       return;
     }
-    c.execute(args);
+    await c.execute(client, args);
   }
 
   operator +(Command c) {
