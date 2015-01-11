@@ -81,6 +81,7 @@ class ExitCommand extends Command {
 
   Future execute(CliClient client, List<String> args) {
     print("Exiting...");
+    client.client = null;
     client.stop();
   }
 }
