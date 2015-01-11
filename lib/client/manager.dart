@@ -13,7 +13,7 @@ class CommandManager {
   factory CommandManager({bool useDefault: true}) {
     var manager = new CommandManager._internal();
     if (useDefault) {
-      manager.add(new ExitCommand());
+      manager += new ExitCommand();
     }
     return manager;
   }
@@ -33,5 +33,10 @@ class CommandManager {
       return;
     }
     c.execute(args);
+  }
+
+  operator +(Command c) {
+    add(c);
+    return this;
   }
 }
