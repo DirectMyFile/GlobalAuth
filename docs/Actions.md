@@ -1,6 +1,7 @@
 # Actions
 
-All parameters are required unless explicitly defined as optional.
+All parameters are required unless explicitly defined as optional. See
+permissions for granting access to invoking actions.
 
 ## Auth
 
@@ -21,4 +22,4 @@ No special permissions are required for this action.
 Error Codes
 ---
 
-TODO
+* 1 - Invalid username or password
