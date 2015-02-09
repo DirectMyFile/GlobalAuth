@@ -53,16 +53,16 @@ class Server {
   }
 
   void _handler(Socket s) {
-    print("Client connected");
+    print("Client connected from " + s.address.address);
     s.transform(UTF8.decoder).transform(new CRLFLineSplitter())
                                           .listen((String data) {
       var json = JSON.decode(data);
-    }, onDone: _clientDisconnected,
-        onError: (_) => _clientDisconnected());
+    }, onDone: () => _clientDisconnected(s),
+        onError: (_) => _clientDisconnected(s));
   }
 
-  void _clientDisconnected() {
-    print("Client disconnected");
+  void _clientDisconnected(Socket s) {
+    print("Client disconnected from " + s.address.address);
   }
 
   void stop() {
