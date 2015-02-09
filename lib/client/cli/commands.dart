@@ -11,7 +11,12 @@ abstract class Command {
     if (name == null) throw new ArgumentError.notNull("name");
   }
 
-  Future execute(CliClient client, List<String> args);
+  /**
+   * Get help description of the command
+   */
+  String getDescription();
+
+  Future execute(CliClient client, List<dynamic> args);
 }
 
 /**
@@ -26,7 +31,11 @@ class ConnectCommand extends Command {
 
   ConnectCommand() : super(name: 'connect');
 
-  Future execute(CliClient client, List<String> args) async {
+  @override
+  String getDescription() => "Connects to a server for interaction";
+
+  @override
+  Future execute(CliClient client, List<dynamic> args) async {
     print("Connecting to server...");
 
     String address = 'localhost';
@@ -66,7 +75,11 @@ class DisconnectCommand extends Command {
 
   DisconnectCommand() : super(name: 'disconnect');
 
-  Future execute(CliClient client, List<String> args) {
+  @override
+  String getDescription() => "Disconnects from the server";
+
+  @override
+  Future execute(CliClient client, List<dynamic> args) {
     client.client = null;
     print("Disconnected from server");
   }
@@ -79,7 +92,11 @@ class ExitCommand extends Command {
 
   ExitCommand() : super(name: 'exit');
 
-  Future execute(CliClient client, List<String> args) {
+  @override
+  String getDescription() => "Exits the client and closes any active connection";
+
+  @override
+  Future execute(CliClient client, List<dynamic> args) {
     print("Exiting...");
     client.client = null;
     client.stop();

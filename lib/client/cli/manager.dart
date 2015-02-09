@@ -30,11 +30,34 @@ class CommandManager {
 
   Future execute(CliClient client, String command, List<String> args) async {
     Command c = commands[command];
-    if (c == null) {
+    if (command == "help") {
+      printHelp();
+      return;
+    } else if (c == null) {
       print("Command does not exist: $command");
       return;
     }
     await c.execute(client, args);
+  }
+
+  void printHelp() {
+    int minSpaces = 0;
+    for (var name in commands.keys) {
+      int len = name.length;
+      if (len > minSpaces)
+        minSpaces = len;
+    }
+
+    for (var comm in commands.values) {
+      var name = comm.name;
+      while (name.length < minSpaces)
+        name += " ";
+      _printCommand(name, comm);
+    }
+  }
+
+  void _printCommand(String name, Command command) {
+    print("$name - ${command.getDescription()}");
   }
 
   operator +(Command c) {
